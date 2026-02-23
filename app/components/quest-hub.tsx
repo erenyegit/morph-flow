@@ -74,7 +74,6 @@ export function QuestHub() {
     setCompleted(loadCompleted());
   }, []);
 
-  const completedIds = Array.from(completed);
   const earnedXp = QUESTS.filter((q) => completed.has(q.id)).reduce(
     (s, q) => s + q.xp,
     0
@@ -89,24 +88,24 @@ export function QuestHub() {
   }
 
   return (
-    <section id="quests" className="relative px-6 py-16">
-      <div className="mx-auto max-w-7xl">
-        {/* CTA Banner */}
+    <div className="relative">
+      <div className="mx-auto w-full">
+        {/* CTA Banner - institutional copy */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="quest-card-neon mb-10 rounded-2xl border-2 border-morph/30 bg-morph/5 px-6 py-5 text-center sm:px-8 sm:py-6"
+          className="glass-card mb-10 rounded-2xl border border-morph/15 px-6 py-5 text-center sm:px-8 sm:py-6"
         >
-          <p className="text-lg font-bold text-foreground sm:text-xl">
-            WANT TO GET AIRDROP?
-          </p>
-          <p className="mt-1 text-sm font-medium text-muted">
-            Start completing missions below to maximize your Morph Zoo XP.
+          <h2 className="text-lg font-bold text-foreground sm:text-xl">
+            Unlock Your Potential in the Morph Ecosystem
+          </h2>
+          <p className="mt-2 text-sm font-medium text-muted">
+            Discover official reward programs, track network growth, and
+            contribute to the future of the Consumer Layer.
           </p>
         </motion.div>
 
-        {/* Section header + Progress */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -115,15 +114,15 @@ export function QuestHub() {
         >
           <div className="flex items-center gap-2">
             <Trophy className="h-6 w-6 text-morph" />
-            <h2 className="text-2xl font-bold text-foreground">
-              Morph Zoo: Daily Quests
-            </h2>
+            <h3 className="text-xl font-bold text-foreground">
+              Active Quests
+            </h3>
           </div>
           <div className="min-w-0 flex-1 sm:max-w-xs">
             <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted">
-              Today&apos;s XP Goal: {earnedXp} / {TOTAL_XP}
+              Today&apos;s XP: {earnedXp} / {TOTAL_XP}
             </p>
-            <div className="h-2.5 overflow-hidden rounded-full bg-surface-light">
+            <div className="h-2 overflow-hidden rounded-full bg-surface-light">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${(earnedXp / TOTAL_XP) * 100}%` }}
@@ -134,7 +133,6 @@ export function QuestHub() {
           </div>
         </motion.div>
 
-        {/* Task cards */}
         <div className="grid gap-4 sm:grid-cols-2">
           {QUESTS.map((quest, i) => {
             const done = completed.has(quest.id);
@@ -144,8 +142,8 @@ export function QuestHub() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.08 }}
-                className="quest-card-neon flex items-start gap-4 rounded-2xl border-2 border-morph/25 bg-surface/40 p-5 backdrop-blur-sm transition hover:border-morph/40"
+                transition={{ delay: i * 0.06 }}
+                className="glass-card flex items-start gap-4 rounded-2xl p-5"
               >
                 <button
                   type="button"
@@ -153,7 +151,7 @@ export function QuestHub() {
                   className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition ${
                     done
                       ? "bg-morph text-background"
-                      : "border-2 border-morph/50 bg-transparent text-morph/70 hover:bg-morph/10 hover:border-morph"
+                      : "border-2 border-morph/40 bg-transparent text-morph/70 hover:bg-morph/10 hover:border-morph"
                   }`}
                   aria-label={done ? "Mark incomplete" : "Mark completed"}
                 >
@@ -164,7 +162,7 @@ export function QuestHub() {
                   )}
                 </button>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-bold text-foreground">{quest.title}</h3>
+                  <h4 className="font-bold text-foreground">{quest.title}</h4>
                   <p className="mt-0.5 text-sm text-muted">
                     {quest.description}
                   </p>
@@ -177,6 +175,6 @@ export function QuestHub() {
           })}
         </div>
       </div>
-    </section>
+    </div>
   );
 }

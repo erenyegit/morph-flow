@@ -18,8 +18,9 @@ import { FeaturedCard } from "./components/featured-card";
 import { HeroProjectCard } from "./components/hero-project-card";
 import { LiveTicker } from "./components/live-ticker";
 import { SubmitModal } from "./components/submit-modal";
-import { AnimatedBg } from "./components/animated-bg";
 import { Fab } from "./components/fab";
+import { BentoCta } from "./components/bento-cta";
+import { BridgeToolsCard } from "./components/bridge-tools-card";
 import { BottomNav } from "./components/bottom-nav";
 import { LoadingShimmer } from "./components/loading-shimmer";
 import { NetworkBar } from "./components/network-bar";
@@ -187,10 +188,11 @@ export default function Home() {
   return (
     <div className="grid-bg relative min-h-screen bg-background text-foreground pb-20 md:pb-0">
       <div className="matte-bg" />
-      <div className="mesh-gradient" />
-      <div className="aurora-bg" />
-      <div className="noise-overlay" />
-      <AnimatedBg />
+      <div className="ambient-glows">
+        <div className="glow-1" aria-hidden />
+        <div className="glow-2" aria-hidden />
+        <div className="glow-3" aria-hidden />
+      </div>
 
       <LoadingShimmer show={isLoading} />
 
@@ -206,6 +208,7 @@ export default function Home() {
           <div className="hidden items-center gap-8 text-sm font-medium text-muted md:flex">
             <a href="#pulse" className="transition hover:text-foreground">Pulse</a>
             <a href="#quests" className="transition hover:text-foreground">Quests</a>
+            <a href="#bridge-tools" className="transition hover:text-foreground">Bridge & Tools</a>
             <a href="#directory" className="transition hover:text-foreground">Directory</a>
             <a href="#resource" className="transition hover:text-foreground">Grants</a>
           </div>
@@ -306,7 +309,10 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="mb-10 text-center"
           >
-            <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Live Network Pulse</h2>
+            <div className="flex items-center justify-center gap-2">
+              <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Live Network Pulse</h2>
+              <span className="live-dot" aria-label="Live" />
+            </div>
             <p className="mt-2 text-sm font-medium text-muted">
               Real-time metrics from the Morph L2 network
             </p>
@@ -323,8 +329,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ───────── MORPH ZOO: DAILY QUESTS ───────── */}
-      <QuestHub />
+      {/* ───────── QUESTS + BRIDGE & TOOLS ───────── */}
+      <section id="quests-section" className="relative px-6 py-16">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+            <div id="quests">
+              <QuestHub />
+            </div>
+            <div id="bridge-tools" className="lg:pt-0">
+              <BridgeToolsCard />
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ───────── ECOSYSTEM DIRECTORY ───────── */}
       <section id="directory" className="relative px-6 py-24">
@@ -518,9 +535,15 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ───────── BENTO CTA ───────── */}
+      <BentoCta />
+
       {/* ───────── FOOTER ───────── */}
       <footer className="relative border-t border-border px-6 py-16">
         <div className="mx-auto max-w-7xl">
+          <p className="mb-8 text-center text-xs font-medium text-muted/80">
+            Powered by Morph Community
+          </p>
           <div className="flex flex-col items-center justify-between gap-8 sm:flex-row">
             <div>
               <span className="text-lg font-bold tracking-tight text-foreground">
