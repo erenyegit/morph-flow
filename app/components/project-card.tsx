@@ -43,12 +43,17 @@ export interface Project {
   sparklineData?: number[];
   hasQuest?: boolean;
   zooPoints?: number;
+  websiteUrl?: string;
+  docsUrl?: string;
+  ecosystemFit?: string;
+  discordActivity?: string;
 }
 
 const defaultSparkline = [42, 48, 45, 52, 58, 55, 62, 68, 72, 70, 75, 78];
 
 interface ProjectCardProps extends Project {
   index: number;
+  onSelect?: () => void;
 }
 
 export function ProjectCard({
@@ -63,6 +68,7 @@ export function ProjectCard({
   hasQuest,
   zooPoints = 0,
   index,
+  onSelect,
 }: ProjectCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
@@ -93,6 +99,13 @@ export function ProjectCard({
     <motion.div
       ref={cardRef}
       layout
+      role={onSelect ? "button" : undefined}
+      tabIndex={onSelect ? 0 : undefined}
+      onClick={(e) => {
+        if ((e.target as HTMLElement).closest("a")) return;
+        onSelect?.();
+      }}
+      onKeyDown={onSelect ? (e) => e.key === "Enter" && onSelect() : undefined}
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
@@ -105,7 +118,7 @@ export function ProjectCard({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       whileHover={{ scale: 1.02, transition: { duration: 0.25 } }}
-      className="group relative glass-card p-6 transition-shadow duration-300 hover:glow-morph-intense"
+      className="group relative glass-card cursor-pointer p-6 transition-shadow duration-300 hover:glow-morph-intense"
     >
       <div className="flex items-start justify-between">
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-morph/10 text-lg font-bold text-morph">

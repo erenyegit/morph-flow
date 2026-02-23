@@ -3,7 +3,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowRight,
   BookOpen,
   ExternalLink,
   Search,
@@ -14,17 +13,17 @@ import {
 } from "lucide-react";
 import { ProjectCard } from "./components/project-card";
 import type { Project } from "./components/project-card";
-import { FeaturedCard } from "./components/featured-card";
-import { HeroProjectCard } from "./components/hero-project-card";
-import { LiveTicker } from "./components/live-ticker";
 import { SubmitModal } from "./components/submit-modal";
 import { Fab } from "./components/fab";
 import { BentoCta } from "./components/bento-cta";
 import { BridgeToolsCard } from "./components/bridge-tools-card";
 import { BottomNav } from "./components/bottom-nav";
 import { LoadingShimmer } from "./components/loading-shimmer";
-import { NetworkBar } from "./components/network-bar";
-import { QuestHub } from "./components/quest-hub";
+import { Sidebar } from "./components/sidebar";
+import { NetworkAnalyticsCard } from "./components/network-analytics-card";
+import { DailyZooQuestCard } from "./components/daily-zoo-quest-card";
+import { LiveStatsCards } from "./components/live-stats-cards";
+import { ProjectDetailDrawer } from "./components/project-detail-drawer";
 
 const spark = (base: number, variance: number, points: number) =>
   Array.from({ length: points }, (_, i) =>
@@ -42,6 +41,10 @@ const allProjects: Project[] = [
     statusLabel: "Mainnet Live",
     twitterFollowers: "520k+",
     sparklineData: spark(70, 12, 12),
+    websiteUrl: "https://bitget.com",
+    docsUrl: "https://bitget.com/docs",
+    discordActivity: "High",
+    ecosystemFit: "Core infrastructure for Morph’s consumer layer. Enables seamless onboarding and multi-chain access for the $150M Payment Ecosystem.",
   },
   {
     name: "Alchemy Pay",
@@ -53,6 +56,10 @@ const allProjects: Project[] = [
     statusLabel: "Mainnet Live",
     twitterFollowers: "120k+",
     sparklineData: spark(65, 10, 12),
+    websiteUrl: "https://alchemypay.io",
+    docsUrl: "https://docs.alchemypay.io",
+    discordActivity: "Active",
+    ecosystemFit: "Direct alignment with Morph’s payment vision. Powers fiat on-ramps and real-world spending for Consumer Layer apps.",
   },
   {
     name: "Abyss World",
@@ -63,6 +70,9 @@ const allProjects: Project[] = [
     statusLabel: "Mainnet Live",
     twitterFollowers: "80k+",
     sparklineData: spark(60, 14, 12),
+    websiteUrl: "https://abyssworld.com",
+    discordActivity: "Very High",
+    ecosystemFit: "Showcases Morph’s capacity for high-quality gaming. Drives adoption and proves L2 performance for consumer entertainment.",
   },
   {
     name: "Pyth Network",
@@ -73,6 +83,9 @@ const allProjects: Project[] = [
     statusLabel: "Mainnet Live",
     twitterFollowers: "250k+",
     sparklineData: spark(55, 15, 12),
+    websiteUrl: "https://pyth.network",
+    docsUrl: "https://docs.pyth.network",
+    ecosystemFit: "Critical data layer for DeFi and payment apps on Morph. Ensures accurate pricing and settlement for the Consumer Layer.",
   },
   {
     name: "MorphPay",
@@ -83,6 +96,8 @@ const allProjects: Project[] = [
     statusLabel: "Mainnet Live",
     twitterFollowers: "50k+",
     sparklineData: spark(50, 12, 12),
+    websiteUrl: "https://morphpay.io",
+    ecosystemFit: "Native payment rails for Morph. Turns crypto into everyday spend—core to the $150M Payment Accelerator narrative.",
   },
   {
     name: "BulbaSwap",
@@ -95,6 +110,9 @@ const allProjects: Project[] = [
     sparklineData: spark(45, 10, 12),
     hasQuest: true,
     zooPoints: 30,
+    websiteUrl: "https://bulbaswap.io",
+    discordActivity: "Growing",
+    ecosystemFit: "Primary DEX for Morph’s consumer assets. Enables swaps and liquidity for payment and gaming use cases.",
   },
   {
     name: "Zoo Wallet",
@@ -107,12 +125,10 @@ const allProjects: Project[] = [
     sparklineData: spark(40, 12, 12),
     hasQuest: true,
     zooPoints: 20,
+    websiteUrl: "https://morphl2.io/zoo",
+    ecosystemFit: "Central hub for Morph Zoo Incentives and Ecosystem Rewards. Drives daily engagement on the Consumer Layer.",
   },
 ];
-
-const featuredProjects = allProjects.filter((p) => p.featured);
-const discoveryProjects = allProjects.filter((p) => !p.featured);
-const topProject = featuredProjects[0];
 
 const filters = ["All", "Payment", "DeFi", "Gaming", "Infrastructure", "Social"];
 
@@ -149,14 +165,18 @@ const grantSteps = [
   },
 ];
 
+const stagger = { visible: { transition: { staggerChildren: 0.06, delayChildren: 0.1 } } };
+const itemReveal = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
+
 export default function Home() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const t = setTimeout(() => setIsLoading(false), 2200);
+    const t = setTimeout(() => setIsLoading(false), 1800);
     return () => clearTimeout(t);
   }, []);
 
@@ -168,8 +188,8 @@ export default function Home() {
     return () => document.removeEventListener("open-submit-modal", openModal);
   }, []);
 
-  const filteredDiscovery = useMemo(() => {
-    let list = discoveryProjects;
+  const filteredProjects = useMemo(() => {
+    let list = allProjects;
     if (activeFilter !== "All") {
       list = list.filter((p) => p.category === activeFilter);
     }
@@ -196,258 +216,132 @@ export default function Home() {
 
       <LoadingShimmer show={isLoading} />
 
-      {/* ───────── HEADER: Network Bar + Nav ───────── */}
-      <header className="fixed top-0 left-0 right-0 z-50 w-full">
-        <NetworkBar />
-        <nav className="w-full glass">
-          <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-          <span className="text-lg font-bold tracking-tight text-foreground">
-            <span className="text-morph">morph</span>
-            <span className="font-normal text-muted">.directory</span>
-          </span>
-          <div className="hidden items-center gap-8 text-sm font-medium text-muted md:flex">
-            <a href="#pulse" className="transition hover:text-foreground">Pulse</a>
-            <a href="#quests" className="transition hover:text-foreground">Quests</a>
-            <a href="#bridge-tools" className="transition hover:text-foreground">Bridge & Tools</a>
-            <a href="#directory" className="transition hover:text-foreground">Directory</a>
-            <a href="#resource" className="transition hover:text-foreground">Grants</a>
-          </div>
-          <a
-            href="#directory"
-            className="rounded-full bg-morph px-4 py-2 text-sm font-semibold text-background transition hover:bg-morph-dim"
-          >
-            Explore
-          </a>
-        </div>
-        </nav>
-      </header>
+      <Sidebar />
 
-      {/* ───────── HERO ───────── */}
-      <section className="radial-hero relative flex min-h-[92vh] flex-col items-center justify-center overflow-hidden px-6 pt-32 text-center">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-1/2 top-1/4 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-morph/[0.06] blur-[140px]" />
-          <div className="absolute right-1/4 top-1/3 h-[350px] w-[350px] rounded-full bg-morph-dim/[0.04] blur-[110px]" />
-        </div>
-
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
-          className="relative z-10 flex max-w-3xl flex-col items-center gap-6"
-        >
-          <motion.div
-            variants={fadeUp}
-            transition={{ duration: 0.6, delay: 0, ease: "easeOut" }}
-            className="inline-flex items-center gap-2 rounded-full border border-morph/20 bg-morph/5 px-4 py-1.5 text-xs font-semibold text-morph"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-morph opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-morph" />
-            </span>
-            Live on Mainnet
-          </motion.div>
-
-          <motion.h1
-            variants={fadeUp}
-            transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
-            className="text-4xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl lg:text-6xl"
-          >
-            The Gateway to{" "}
-            <span className="text-gradient-morph">Morph Consumer Layer</span>
-          </motion.h1>
-
-          <motion.p
-            variants={fadeUp}
-            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-            className="max-w-xl text-base font-medium leading-relaxed text-muted sm:text-lg"
-          >
-            High-utility ecosystem dashboard for Morph&apos;s{" "}
-            <span className="font-bold text-morph">$150M</span> Payment &
-            Consumer Ecosystem.
-          </motion.p>
-
-          <motion.div
-            variants={fadeUp}
-            transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
-            className="flex flex-wrap items-center justify-center gap-4 pt-2"
-          >
+      {/* Main: offset by sidebar */}
+      <main className="relative pl-16 md:pl-20">
+        {/* Compact top bar */}
+        <header className="sticky top-0 z-30 border-b border-border/40 bg-background/80 py-4 backdrop-blur-[25px]">
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6">
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-bold tracking-tight text-foreground">
+                <span className="text-morph">morph</span>
+                <span className="font-normal text-muted">.directory</span>
+              </span>
+              <span className="rounded-full border border-morph/20 bg-morph/5 px-2 py-0.5 text-[10px] font-semibold text-morph">
+                Ecosystem Terminal
+              </span>
+            </div>
             <a
               href="#directory"
-              className="group inline-flex items-center gap-2 rounded-full bg-morph px-6 py-3 text-sm font-semibold text-background transition hover:bg-morph-dim"
+              className="rounded-full bg-morph px-4 py-2 text-sm font-semibold text-background transition hover:bg-morph-dim"
             >
-              Explore Apps
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              Explore
             </a>
-            <button
-              onClick={() => setModalOpen(true)}
-              className="inline-flex items-center gap-2 rounded-full border border-morph/30 px-6 py-3 text-sm font-semibold text-foreground transition hover:border-morph hover:bg-morph/10 hover:text-morph"
-            >
-              Connect your project
-            </button>
-          </motion.div>
-        </motion.div>
+          </div>
+        </header>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 1 }}
-          className="absolute bottom-8 flex flex-col items-center gap-2 text-xs text-muted"
-        >
-          <span>Scroll to explore</span>
-          <div className="h-8 w-[1px] bg-gradient-to-b from-muted/60 to-transparent" />
-        </motion.div>
-      </section>
-
-      {/* ───────── LIVE NETWORK PULSE ───────── */}
-      <section id="pulse" className="radial-stats relative px-6 py-20">
-        <div className="mx-auto max-w-7xl">
-          <motion.div
-            variants={sectionReveal}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.6 }}
-            className="mb-10 text-center"
-          >
-            <div className="flex items-center justify-center gap-2">
-              <h2 className="text-2xl font-bold text-foreground sm:text-3xl">Live Network Pulse</h2>
-              <span className="live-dot" aria-label="Live" />
-            </div>
-            <p className="mt-2 text-sm font-medium text-muted">
-              Real-time metrics from the Morph L2 network
-            </p>
-          </motion.div>
-          <motion.div
-            variants={sectionReveal}
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+          {/* Bento: Top row — 60% Analytics + 40% Daily Quest */}
+          <motion.section
+            id="analytics"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            variants={stagger}
+            className="mb-8 grid gap-6 lg:grid-cols-[3fr_2fr]"
           >
-            <LiveTicker />
-          </motion.div>
-        </div>
-      </section>
+            <motion.div variants={itemReveal}>
+              <NetworkAnalyticsCard />
+            </motion.div>
+            <motion.div variants={itemReveal} id="quests">
+              <DailyZooQuestCard />
+            </motion.div>
+          </motion.section>
 
-      {/* ───────── QUESTS + BRIDGE & TOOLS ───────── */}
-      <section id="quests-section" className="relative px-6 py-16">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
-            <div id="quests">
-              <QuestHub />
-            </div>
-            <div id="bridge-tools" className="lg:pt-0">
-              <BridgeToolsCard />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ───────── ECOSYSTEM DIRECTORY ───────── */}
-      <section id="directory" className="relative px-6 py-24">
-        <div className="mx-auto max-w-7xl">
-          <motion.div
-            variants={sectionReveal}
+          {/* Bento: Middle row — 3 Live Stats */}
+          <motion.section
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            variants={stagger}
             className="mb-8"
           >
-            <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
-              Ecosystem Directory
-            </h2>
-            <p className="mt-2 text-sm font-medium text-muted">
-              Discover real Morph partners and community projects
-            </p>
-          </motion.div>
+            <motion.div variants={itemReveal}>
+              <LiveStatsCards />
+            </motion.div>
+          </motion.section>
 
-          {/* Search + Segmented filter */}
-          <motion.div
-            variants={sectionReveal}
-            initial="hidden"
-            whileInView="visible"
+          {/* Bridge & Tools */}
+          <motion.section
+            id="bridge-tools"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+            className="mb-12"
           >
-            <div className="relative flex-1 sm:max-w-sm">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
-              <input
-                type="search"
-                placeholder="Search projects..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-2xl border border-border bg-surface py-2.5 pl-9 pr-4 text-sm font-medium text-foreground outline-none transition placeholder:text-muted focus:border-morph/40 focus:ring-1 focus:ring-morph/20"
-              />
-            </div>
-            <div className="segmented-control inline-flex flex-wrap gap-1 p-1">
-              {filters.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => setActiveFilter(tag)}
-                  className={`rounded-full px-4 py-2 text-xs font-semibold transition ${
-                    tag === activeFilter
-                      ? "bg-morph text-background"
-                      : "text-muted hover:bg-surface-light hover:text-foreground"
-                  }`}
-                >
-                  {tag}
-                </button>
-              ))}
-            </div>
-          </motion.div>
+            <BridgeToolsCard />
+          </motion.section>
 
-          {/* Featured Hero Card (top project) */}
-          {topProject && (
+          {/* Project Directory — filterable grid */}
+          <section id="directory" className="relative py-8">
             <motion.div
-              variants={sectionReveal}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-6"
+            >
+              <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
+                Project Directory
+              </h2>
+              <p className="mt-1 text-sm font-medium text-muted">
+                Deep insights into Morph Consumer Layer partners
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div className="relative flex-1 sm:max-w-xs">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+                <input
+                  type="search"
+                  placeholder="Search projects..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full rounded-xl border border-border bg-surface py-2.5 pl-9 pr-4 text-sm font-medium text-foreground outline-none transition placeholder:text-muted focus:border-morph/40 focus:ring-1 focus:ring-morph/20"
+                />
+              </div>
+              <div className="segmented-control inline-flex flex-wrap gap-1 p-1">
+                {filters.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => setActiveFilter(tag)}
+                    className={`rounded-full px-4 py-2 text-xs font-semibold transition ${
+                      tag === activeFilter
+                        ? "bg-morph text-background"
+                        : "text-muted hover:bg-surface-light hover:text-foreground"
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div
+              layout
+              variants={stagger}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="mb-16 [perspective:1000px]"
+              className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 [perspective:1000px]"
             >
-              <h3 className="mb-5 text-xs font-bold uppercase tracking-wider text-muted">
-                Featured App Spotlight
-              </h3>
-              <HeroProjectCard {...topProject} index={0} />
-            </motion.div>
-          )}
-
-          {/* Featured row */}
-          <motion.div
-            variants={sectionReveal}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="mb-16"
-          >
-            <h3 className="mb-5 text-xs font-bold uppercase tracking-wider text-muted">
-              Featured Partners
-            </h3>
-            <div className="grid gap-6 sm:grid-cols-2 [perspective:1000px]">
-              {featuredProjects.slice(1).map((project, i) => (
-                <FeaturedCard key={project.name} {...project} index={i} />
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Discovery grid */}
-          <motion.div
-            variants={sectionReveal}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <h3 className="mb-5 text-xs font-bold uppercase tracking-wider text-muted">
-              Discover More
-            </h3>
-            <motion.div layout className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 [perspective:1000px]">
               <AnimatePresence mode="popLayout">
-                {filteredDiscovery.length === 0 ? (
+                {filteredProjects.length === 0 ? (
                   <motion.p
                     layout
                     initial={{ opacity: 0 }}
@@ -455,22 +349,27 @@ export default function Home() {
                     exit={{ opacity: 0 }}
                     className="col-span-full py-12 text-center text-sm font-medium text-muted"
                   >
-                    No projects match your search. Try a different filter or query.
+                    No projects match your search.
                   </motion.p>
                 ) : (
-                  filteredDiscovery.map((project, i) => (
-                    <ProjectCard key={project.name} {...project} index={i} />
+                  filteredProjects.map((project, i) => (
+                    <motion.div key={project.name} layout variants={itemReveal}>
+                      <ProjectCard
+                        {...project}
+                        index={i}
+                        onSelect={() => setSelectedProject(project)}
+                      />
+                    </motion.div>
                   ))
                 )}
               </AnimatePresence>
             </motion.div>
-          </motion.div>
+          </section>
         </div>
-      </section>
 
-      {/* ───────── GRANT ROADMAP ───────── */}
-      <section id="resource" className="relative px-6 py-24">
-        <div className="mx-auto max-w-4xl">
+        {/* Grant Roadmap */}
+        <section id="resource" className="relative py-16">
+        <div className="mx-auto max-w-4xl px-4 sm:px-0">
           <motion.div
             variants={sectionReveal}
             initial="hidden"
@@ -535,12 +434,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ───────── BENTO CTA ───────── */}
-      <BentoCta />
+        <BentoCta />
 
-      {/* ───────── FOOTER ───────── */}
-      <footer className="relative border-t border-border px-6 py-16">
-        <div className="mx-auto max-w-7xl">
+        {/* Footer */}
+        <footer className="relative border-t border-border px-4 py-12 sm:px-6">
+          <div className="mx-auto max-w-7xl">
           <p className="mb-8 text-center text-xs font-medium text-muted/80">
             Powered by Morph Community
           </p>
@@ -568,11 +466,14 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </footer>
-
-      <Fab onClick={() => setModalOpen(true)} />
-      <BottomNav />
-      <SubmitModal open={modalOpen} onClose={() => setModalOpen(false)} />
+        </footer>
+      </main>
+      <>
+        <ProjectDetailDrawer project={selectedProject} onClose={() => setSelectedProject(null)} />
+        <Fab onClick={() => setModalOpen(true)} />
+        <BottomNav />
+        <SubmitModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      </>
     </div>
   );
 }
