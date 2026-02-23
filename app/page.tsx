@@ -72,11 +72,7 @@ const projects = [
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, delay: i * 0.1, ease: "easeOut" },
-  }),
+  visible: { opacity: 1, y: 0 },
 };
 
 export default function Home() {
@@ -126,7 +122,7 @@ export default function Home() {
         >
           <motion.div
             variants={fadeUp}
-            custom={0}
+            transition={{ duration: 0.6, delay: 0, ease: "easeOut" }}
             className="inline-flex items-center gap-2 rounded-full border border-morph/20 bg-morph/5 px-4 py-1.5 text-xs font-medium text-morph"
           >
             <span className="relative flex h-2 w-2">
@@ -138,7 +134,7 @@ export default function Home() {
 
           <motion.h1
             variants={fadeUp}
-            custom={1}
+            transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
             className="text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl"
           >
             Explore the{" "}
@@ -147,7 +143,7 @@ export default function Home() {
 
           <motion.p
             variants={fadeUp}
-            custom={2}
+            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
             className="max-w-xl text-base leading-relaxed text-muted sm:text-lg"
           >
             The ultimate directory and real-time pulse for Morph&apos;s{" "}
@@ -157,7 +153,7 @@ export default function Home() {
 
           <motion.div
             variants={fadeUp}
-            custom={3}
+            transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
             className="flex flex-wrap items-center justify-center gap-4 pt-2"
           >
             <a
