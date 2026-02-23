@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Home, LayoutGrid, BookOpen, Plus } from "lucide-react";
+import { Home, Trophy, LayoutGrid, BookOpen, Plus } from "lucide-react";
 
 export function BottomNav() {
   function openSubmit() {
@@ -19,11 +19,18 @@ export function BottomNav() {
           <span className="text-[10px] font-medium">Home</span>
         </Link>
         <Link
+          href="#quests"
+          className="flex flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-muted transition hover:bg-surface-light hover:text-foreground"
+        >
+          <Trophy className="h-5 w-5" />
+          <span className="text-[10px] font-medium">Quests</span>
+        </Link>
+        <Link
           href="#directory"
-          className="flex flex-col items-center gap-0.5 rounded-lg px-4 py-1.5 text-muted transition hover:bg-surface-light hover:text-foreground"
+          className="flex flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-muted transition hover:bg-surface-light hover:text-foreground"
         >
           <LayoutGrid className="h-5 w-5" />
-          <span className="text-[10px] font-medium">Directory</span>
+          <span className="text-[10px] font-medium">Apps</span>
         </Link>
         <Link
           href="#resource"

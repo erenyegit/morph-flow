@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #0a0a0c;
+  --color-background: #060608;
   --color-foreground: #fafafa;
   --color-morph: #A3E635;
   --color-morph-dim: #84cc16;
   --color-morph-dark: #4d7c0f;
-  --color-charcoal: #141416;
+  --color-charcoal: #0c0c0e;
   --color-surface: #18181b;
   --color-surface-light: #27272a;
   --color-border: #3f3f46;
@@ -46,6 +46,51 @@ body {
     radial-gradient(ellipse 60% 40% at 80% 60%, rgba(163, 230, 53, 0.05), transparent),
     radial-gradient(ellipse 50% 30% at 50% 80%, rgba(163, 230, 53, 0.04), transparent);
   animation: mesh-shift 15s ease-in-out infinite;
+}
+
+/* Green aurora (premium Web3) */
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.aurora-bg::before,
+.aurora-bg::after {
+  content: "";
+  position: absolute;
+  width: 150%;
+  height: 80%;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.2;
+  animation: aurora 20s ease-in-out infinite;
+}
+
+.aurora-bg::before {
+  top: -30%;
+  left: -20%;
+  background: rgba(163, 230, 53, 0.15);
+  animation-delay: -5s;
+}
+
+.aurora-bg::after {
+  bottom: -30%;
+  right: -20%;
+  background: rgba(132, 204, 22, 0.12);
+}
+
+@keyframes aurora {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(5%, -5%) scale(1.05); }
+  66% { transform: translate(-5%, 5%) scale(0.95); }
+}
+
+/* Quest cards: neon border */
+.quest-card-neon {
+  box-shadow: 0 0 20px rgba(163, 230, 53, 0.08), inset 0 0 0 1px rgba(163, 230, 53, 0.1);
 }
 
 @keyframes mesh-shift {
@@ -199,7 +244,9 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .animate-float-slow,
   .animate-float-slower,
-  .mesh-gradient { animation: none; }
+  .mesh-gradient,
+  .aurora-bg::before,
+  .aurora-bg::after { animation: none; }
   .mesh-gradient { opacity: 0.5; }
 }
 

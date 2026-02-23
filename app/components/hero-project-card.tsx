@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
-import { ExternalLink, FileText, Twitter } from "lucide-react";
+import { ExternalLink, FileText, Twitter, Target } from "lucide-react";
 import { Sparkline } from "./sparkline";
 import type { Project } from "./project-card";
 
@@ -28,6 +28,8 @@ export function HeroProjectCard({
   activity = 0,
   twitterFollowers,
   sparklineData = defaultSparkline,
+  hasQuest,
+  zooPoints = 0,
   index,
 }: HeroProjectCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -72,8 +74,21 @@ export function HeroProjectCard({
       whileHover={{ scale: 1.01, transition: { duration: 0.25 } }}
       className="glass-featured relative overflow-hidden rounded-[32px] p-8 transition-shadow duration-300 hover:glow-morph-intense sm:p-10"
     >
-      <div className="absolute right-6 top-6 rounded-full bg-morph/20 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-morph">
-        Featured by Morph
+      <div className="absolute right-6 top-6 flex items-center gap-2">
+        {hasQuest && (
+          <div className="group/quest relative">
+            <span className="inline-flex items-center gap-1 rounded-full bg-morph/20 px-2.5 py-0.5 text-[10px] font-semibold text-morph">
+              <Target className="h-3 w-3" />
+              Quest
+            </span>
+            <div className="absolute bottom-full left-1/2 z-10 mb-1 -translate-x-1/2 rounded-lg bg-surface-light px-2.5 py-1.5 text-xs font-medium text-foreground opacity-0 shadow-xl transition-opacity group-hover/quest:opacity-100 pointer-events-none whitespace-nowrap">
+              Completing this gives you {zooPoints} Zoo Points.
+            </div>
+          </div>
+        )}
+        <span className="rounded-full bg-morph/20 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-morph">
+          Featured by Morph
+        </span>
       </div>
 
       <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">

@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
-import { ExternalLink, FileText, Twitter } from "lucide-react";
+import { ExternalLink, FileText, Twitter, Target } from "lucide-react";
 import { Sparkline } from "./sparkline";
 import type { Project } from "./project-card";
 
@@ -35,6 +35,8 @@ export function FeaturedCard({
   statusLabel,
   twitterFollowers,
   sparklineData = defaultSparkline,
+  hasQuest,
+  zooPoints = 0,
   index,
 }: FeaturedCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -79,9 +81,22 @@ export function FeaturedCard({
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-morph/10 text-2xl font-bold text-morph">
           {name.charAt(0)}
         </div>
-        <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${statusStyle.cls} ${statusStyle.glow}`}>
-          {statusLabel ?? statusStyle.label}
-        </span>
+        <div className="flex items-center gap-2">
+          {hasQuest && (
+            <div className="group/quest relative">
+              <span className="inline-flex items-center gap-1 rounded-full bg-morph/20 px-2.5 py-0.5 text-[10px] font-semibold text-morph">
+                <Target className="h-3 w-3" />
+                Quest
+              </span>
+              <div className="absolute bottom-full left-1/2 z-10 mb-1 -translate-x-1/2 rounded-lg bg-surface-light px-2.5 py-1.5 text-xs font-medium text-foreground opacity-0 shadow-xl transition-opacity group-hover/quest:opacity-100 pointer-events-none whitespace-nowrap">
+                Completing this gives you {zooPoints} Zoo Points.
+              </div>
+            </div>
+          )}
+          <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${statusStyle.cls} ${statusStyle.glow}`}>
+            {statusLabel ?? statusStyle.label}
+          </span>
+        </div>
       </div>
 
       <div className="mt-5 flex items-center gap-3">

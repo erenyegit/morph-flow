@@ -22,6 +22,8 @@ import { AnimatedBg } from "./components/animated-bg";
 import { Fab } from "./components/fab";
 import { BottomNav } from "./components/bottom-nav";
 import { LoadingShimmer } from "./components/loading-shimmer";
+import { NetworkBar } from "./components/network-bar";
+import { QuestHub } from "./components/quest-hub";
 
 const spark = (base: number, variance: number, points: number) =>
   Array.from({ length: points }, (_, i) =>
@@ -90,6 +92,8 @@ const allProjects: Project[] = [
     statusLabel: "Incubated",
     twitterFollowers: "35k+",
     sparklineData: spark(45, 10, 12),
+    hasQuest: true,
+    zooPoints: 30,
   },
   {
     name: "Zoo Wallet",
@@ -100,6 +104,8 @@ const allProjects: Project[] = [
     statusLabel: "Testnet",
     twitterFollowers: "28k+",
     sparklineData: spark(40, 12, 12),
+    hasQuest: true,
+    zooPoints: 20,
   },
 ];
 
@@ -182,20 +188,24 @@ export default function Home() {
     <div className="grid-bg relative min-h-screen bg-background text-foreground pb-20 md:pb-0">
       <div className="matte-bg" />
       <div className="mesh-gradient" />
+      <div className="aurora-bg" />
       <div className="noise-overlay" />
       <AnimatedBg />
 
       <LoadingShimmer show={isLoading} />
 
-      {/* ───────── NAVBAR ───────── */}
-      <nav className="fixed top-0 z-50 w-full glass">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+      {/* ───────── HEADER: Network Bar + Nav ───────── */}
+      <header className="fixed top-0 left-0 right-0 z-50 w-full">
+        <NetworkBar />
+        <nav className="w-full glass">
+          <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <span className="text-lg font-bold tracking-tight text-foreground">
             <span className="text-morph">morph</span>
             <span className="font-normal text-muted">.directory</span>
           </span>
           <div className="hidden items-center gap-8 text-sm font-medium text-muted md:flex">
             <a href="#pulse" className="transition hover:text-foreground">Pulse</a>
+            <a href="#quests" className="transition hover:text-foreground">Quests</a>
             <a href="#directory" className="transition hover:text-foreground">Directory</a>
             <a href="#resource" className="transition hover:text-foreground">Grants</a>
           </div>
@@ -206,10 +216,11 @@ export default function Home() {
             Explore
           </a>
         </div>
-      </nav>
+        </nav>
+      </header>
 
       {/* ───────── HERO ───────── */}
-      <section className="radial-hero relative flex min-h-[92vh] flex-col items-center justify-center overflow-hidden px-6 pt-16 text-center">
+      <section className="radial-hero relative flex min-h-[92vh] flex-col items-center justify-center overflow-hidden px-6 pt-32 text-center">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-1/2 top-1/4 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-morph/[0.06] blur-[140px]" />
           <div className="absolute right-1/4 top-1/3 h-[350px] w-[350px] rounded-full bg-morph-dim/[0.04] blur-[110px]" />
@@ -311,6 +322,9 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
+      {/* ───────── MORPH ZOO: DAILY QUESTS ───────── */}
+      <QuestHub />
 
       {/* ───────── ECOSYSTEM DIRECTORY ───────── */}
       <section id="directory" className="relative px-6 py-24">
