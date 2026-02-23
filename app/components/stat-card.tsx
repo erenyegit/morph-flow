@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, TrendingDown } from "lucide-react";
 import { useCounter } from "../hooks/use-counter";
 import type { LucideIcon } from "lucide-react";
 
@@ -54,7 +54,11 @@ export function StatCard({
             {suffix}
           </p>
           <span className="inline-flex items-center gap-0.5 text-xs font-medium text-morph">
-            <TrendingUp className="h-3 w-3" />
+            {growth.startsWith("↓") ? (
+              <TrendingDown className="h-3 w-3" />
+            ) : (
+              <TrendingUp className="h-3 w-3" />
+            )}
             {growth}
           </span>
         </div>

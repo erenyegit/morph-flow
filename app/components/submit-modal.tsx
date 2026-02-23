@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { X, Heart } from "lucide-react";
 import { useState } from "react";
 
 interface SubmitModalProps {
@@ -20,7 +20,7 @@ export function SubmitModal({ open, onClose }: SubmitModalProps) {
     setTimeout(() => {
       setSubmitted(false);
       onClose();
-    }, 2000);
+    }, 2500);
   }
 
   return (
@@ -32,7 +32,10 @@ export function SubmitModal({ open, onClose }: SubmitModalProps) {
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-[100] flex items-center justify-center px-4"
         >
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={onClose}
+          />
 
           <motion.div
             initial={{ opacity: 0, scale: 0.92, y: 20 }}
@@ -41,7 +44,7 @@ export function SubmitModal({ open, onClose }: SubmitModalProps) {
             transition={{ duration: 0.3, ease: "easeOut" }}
             className="glass-card relative z-10 w-full max-w-md rounded-2xl p-8"
           >
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-2 flex items-center justify-between">
               <h3 className="text-xl font-bold">Submit Your Project</h3>
               <button
                 onClick={onClose}
@@ -50,6 +53,10 @@ export function SubmitModal({ open, onClose }: SubmitModalProps) {
                 <X className="h-5 w-5" />
               </button>
             </div>
+            <p className="mb-6 text-xs text-muted">
+              Contribute to the community directory. All submissions are
+              reviewed before listing.
+            </p>
 
             {submitted ? (
               <motion.div
@@ -57,12 +64,14 @@ export function SubmitModal({ open, onClose }: SubmitModalProps) {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex flex-col items-center gap-3 py-8 text-center"
               >
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-morph/15 text-2xl">
-                  ✓
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-morph/15">
+                  <Heart className="h-7 w-7 text-morph" />
                 </div>
-                <p className="text-lg font-semibold text-morph">Submitted!</p>
+                <p className="text-lg font-semibold text-morph">
+                  Thank you!
+                </p>
                 <p className="text-sm text-muted">
-                  We&apos;ll review your project shortly.
+                  Your project has been submitted for community review.
                 </p>
               </motion.div>
             ) : (
@@ -87,9 +96,7 @@ export function SubmitModal({ open, onClose }: SubmitModalProps) {
                     required
                     className="w-full appearance-none rounded-xl border border-border bg-surface px-4 py-2.5 text-sm text-foreground outline-none transition focus:border-morph/40 focus:ring-1 focus:ring-morph/20"
                   >
-                    <option value="" className="text-muted">
-                      Select category
-                    </option>
+                    <option value="">Select category</option>
                     {categories.map((c) => (
                       <option key={c} value={c}>
                         {c}
@@ -114,7 +121,7 @@ export function SubmitModal({ open, onClose }: SubmitModalProps) {
                   type="submit"
                   className="mt-1 w-full rounded-xl bg-morph py-3 text-sm font-semibold text-background transition hover:bg-morph-dim"
                 >
-                  Submit for Review
+                  Submit for Community Review
                 </button>
               </form>
             )}

@@ -24,12 +24,13 @@ body {
   background: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
+  overflow-x: hidden;
 }
 
 .grid-bg {
   background-image:
-    linear-gradient(rgba(163, 230, 53, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(163, 230, 53, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(163, 230, 53, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(163, 230, 53, 0.025) 1px, transparent 1px);
   background-size: 64px 64px;
 }
 
@@ -41,13 +42,13 @@ body {
 
 .glow-morph-intense {
   box-shadow:
-    0 0 30px rgba(163, 230, 53, 0.12),
-    0 0 60px rgba(163, 230, 53, 0.06),
-    0 4px 20px rgba(0, 0, 0, 0.3);
+    0 0 20px rgba(163, 230, 53, 0.15),
+    0 0 50px rgba(163, 230, 53, 0.08),
+    0 4px 24px rgba(0, 0, 0, 0.35);
 }
 
 .glass {
-  background: rgba(24, 24, 27, 0.6);
+  background: rgba(24, 24, 27, 0.65);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(63, 63, 70, 0.5);
@@ -57,7 +58,24 @@ body {
   background: rgba(24, 24, 27, 0.45);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(163, 230, 53, 0.12);
+  border: 1px solid rgba(163, 230, 53, 0.1);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.glass-card:hover {
+  border-color: rgba(163, 230, 53, 0.3);
+}
+
+.glass-featured {
+  background: rgba(24, 24, 27, 0.5);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(163, 230, 53, 0.18);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.glass-featured:hover {
+  border-color: rgba(163, 230, 53, 0.4);
 }
 
 .gradient-morph {
@@ -71,14 +89,61 @@ body {
   background-clip: text;
 }
 
+.badge-glow-green {
+  box-shadow: 0 0 8px rgba(163, 230, 53, 0.25);
+}
+
+.badge-glow-amber {
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.2);
+}
+
+.badge-glow-purple {
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.2);
+}
+
+.badge-glow-sky {
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.2);
+}
+
+.badge-glow-blue {
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.05); }
+  66% { transform: translate(-20px, 15px) scale(0.97); }
+}
+
+@keyframes float-slower {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-25px, 25px) scale(1.03); }
+  66% { transform: translate(15px, -10px) scale(0.98); }
+}
+
+.animate-float-slow {
+  animation: float-slow 20s ease-in-out infinite;
+}
+
+.animate-float-slower {
+  animation: float-slower 25s ease-in-out infinite;
+}
+
 .radial-hero {
   background:
-    radial-gradient(ellipse 600px 400px at 50% 40%, rgba(163, 230, 53, 0.06), transparent),
-    radial-gradient(ellipse 400px 300px at 70% 30%, rgba(132, 204, 22, 0.04), transparent);
+    radial-gradient(ellipse 600px 400px at 50% 40%, rgba(163, 230, 53, 0.05), transparent),
+    radial-gradient(ellipse 400px 300px at 70% 30%, rgba(132, 204, 22, 0.03), transparent);
 }
 
 .radial-stats {
   background:
     radial-gradient(ellipse 500px 300px at 30% 50%, rgba(163, 230, 53, 0.04), transparent),
     radial-gradient(ellipse 400px 250px at 70% 50%, rgba(163, 230, 53, 0.03), transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-slow,
+  .animate-float-slower {
+    animation: none;
+  }
 }
