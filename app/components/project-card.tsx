@@ -19,6 +19,7 @@ export interface Project {
   featured?: boolean;
   activity?: number;
   statusLabel?: string;
+  twitterFollowers?: string;
 }
 
 interface ProjectCardProps extends Project {
@@ -32,9 +33,11 @@ export function ProjectCard({
   status,
   activity = 0,
   statusLabel,
+  twitterFollowers,
   index,
 }: ProjectCardProps) {
   const badge = categoryBadge[category] ?? { cls: "bg-zinc-500/15 text-zinc-400", glow: "" };
+  const statusText = status === "mainnet" ? "Mainnet Ready" : "Active Testnet";
 
   return (
     <motion.div
@@ -51,9 +54,7 @@ export function ProjectCard({
           {name.charAt(0)}
         </div>
         <div className="flex items-center gap-2">
-          {statusLabel && (
-            <span className="text-xs font-medium">{statusLabel}</span>
-          )}
+          <span className="text-xs font-medium text-muted">{statusLabel ?? statusText}</span>
           <span
             className={`flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${
               status === "mainnet"
@@ -66,7 +67,7 @@ export function ProjectCard({
                 status === "mainnet" ? "bg-morph" : "bg-amber-400"
               }`}
             />
-            {status === "mainnet" ? "Mainnet" : "Testnet"}
+            {statusText}
           </span>
         </div>
       </div>
@@ -78,13 +79,11 @@ export function ProjectCard({
         </span>
       </div>
 
-      <p className="mt-1.5 text-sm leading-relaxed text-muted">
-        {description}
-      </p>
+      <p className="mt-1.5 text-sm leading-relaxed text-muted">{description}</p>
 
-      {/* Activity bar */}
+      {/* Popularity meter */}
       <div className="mt-4 flex items-center gap-2.5">
-        <div className="h-1 flex-1 overflow-hidden rounded-full bg-surface-light">
+        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-light">
           <motion.div
             initial={{ width: 0 }}
             whileInView={{ width: `${activity}%` }}
@@ -93,20 +92,20 @@ export function ProjectCard({
             className="h-full rounded-full bg-gradient-to-r from-morph to-morph-dim"
           />
         </div>
-        <span className="flex items-center gap-0.5 text-[10px] font-medium text-muted">
-          <Flame className="h-2.5 w-2.5 text-morph" />
-          {activity}%
-        </span>
+        <span className="text-[10px] font-medium text-muted">{activity}%</span>
       </div>
 
       <div className="mt-4 flex items-center justify-between border-t border-border/40 pt-4">
         <div className="flex items-center gap-2.5">
           <a
             href="#"
-            className="rounded-lg p-1.5 text-muted transition hover:bg-surface-light hover:text-morph"
+            className="flex items-center gap-1 rounded-lg p-1.5 text-muted transition hover:bg-surface-light hover:text-morph"
             aria-label="Twitter"
           >
             <Twitter className="h-3.5 w-3.5" />
+            {twitterFollowers && (
+              <span className="text-[10px] font-medium">{twitterFollowers}</span>
+            )}
           </a>
           <a
             href="#"

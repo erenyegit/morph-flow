@@ -1,129 +1,98 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Activity,
   ArrowRight,
-  Blocks,
-  Gauge,
-  Zap,
   BookOpen,
   ExternalLink,
   Search,
+  ChevronRight,
+  Layers,
+  Zap,
+  CheckCircle2,
 } from "lucide-react";
 import { ProjectCard } from "./components/project-card";
 import type { Project } from "./components/project-card";
 import { FeaturedCard } from "./components/featured-card";
-import { StatCard } from "./components/stat-card";
+import { LiveTicker } from "./components/live-ticker";
 import { SubmitModal } from "./components/submit-modal";
 import { AnimatedBg } from "./components/animated-bg";
-
-const stats = [
-  {
-    label: "Total Transactions",
-    value: 1200000,
-    suffix: "+",
-    prefix: "",
-    decimals: 0,
-    growth: "↑ 12.4%",
-    icon: Activity,
-    accent: "from-morph/20 to-transparent",
-  },
-  {
-    label: "Active Consumer Apps",
-    value: 45,
-    suffix: "+",
-    prefix: "",
-    decimals: 0,
-    growth: "↑ 8.1%",
-    icon: Blocks,
-    accent: "from-morph-dim/20 to-transparent",
-  },
-  {
-    label: "Avg. Transaction Fee",
-    value: 0.01,
-    suffix: "",
-    prefix: "<$",
-    decimals: 2,
-    growth: "↓ 3.2%",
-    icon: Gauge,
-    accent: "from-morph/20 to-transparent",
-  },
-  {
-    label: "TPS",
-    value: 12.5,
-    suffix: "",
-    prefix: "",
-    decimals: 1,
-    growth: "↑ 5.2%",
-    icon: Zap,
-    accent: "from-morph-dim/20 to-transparent",
-  },
-];
+import { Fab } from "./components/fab";
+import { BottomNav } from "./components/bottom-nav";
 
 const allProjects: Project[] = [
   {
-    name: "MorphPay",
-    category: "Payment",
-    description:
-      "Next-gen crypto card solutions for seamless everyday spending.",
+    name: "Bitget Wallet",
+    category: "Infrastructure",
+    description: "The primary gateway for Morph users. Multi-chain wallet with built-in swap and bridge.",
     status: "mainnet",
     featured: true,
-    activity: 92,
-    statusLabel: "🔥 Trending",
+    activity: 95,
+    statusLabel: "Mainnet Ready",
+    twitterFollowers: "520k+",
   },
   {
-    name: "Zoo Wallet",
-    category: "Gaming",
-    description:
-      "Official consumer engagement & rewards hub powered by Morph.",
+    name: "Alchemy Pay",
+    category: "Payment",
+    description: "Global on-ramp for Morph consumer apps. Fiat-to-crypto payments in 173+ countries.",
     status: "mainnet",
     featured: true,
     activity: 88,
-    statusLabel: "🚀 Mainnet Live",
+    statusLabel: "Mainnet Ready",
+    twitterFollowers: "120k+",
   },
   {
-    name: "BitStore",
+    name: "Abyss World",
+    category: "Gaming",
+    description: "AAA action RPG on Morph. Next-gen blockchain gaming with immersive gameplay.",
+    status: "mainnet",
+    activity: 82,
+    statusLabel: "Mainnet Ready",
+    twitterFollowers: "80k+",
+  },
+  {
+    name: "Pyth Network",
+    category: "Infrastructure",
+    description: "Oracle providing real-time market data to Morph dApps. Sub-second price feeds.",
+    status: "mainnet",
+    activity: 78,
+    statusLabel: "Mainnet Ready",
+    twitterFollowers: "250k+",
+  },
+  {
+    name: "MorphPay",
     category: "Payment",
-    description:
-      "Integrated payment gateway bridging crypto and retail commerce.",
+    description: "Next-gen crypto card solutions for seamless everyday spending on Morph.",
     status: "mainnet",
     activity: 71,
-    statusLabel: "🚀 Mainnet Live",
+    statusLabel: "Mainnet Ready",
+    twitterFollowers: "50k+",
   },
   {
     name: "BulbaSwap",
     category: "DeFi",
-    description: "Native liquidity layer optimized for consumer asset swaps.",
+    description: "Native liquidity layer optimized for consumer asset swaps on Morph.",
     status: "mainnet",
     activity: 65,
-    statusLabel: "🔥 Trending",
+    statusLabel: "Mainnet Ready",
+    twitterFollowers: "35k+",
   },
   {
-    name: "SocialMorph",
-    category: "Social",
-    description:
-      "Decentralized identity and social graph for the consumer web.",
-    status: "testnet",
-    activity: 42,
-    statusLabel: "🆕 New",
-  },
-  {
-    name: "MorphBridge",
-    category: "Infrastructure",
-    description:
-      "Canonical bridge for fast L1 ↔ L2 asset transfers on Morph.",
+    name: "Zoo Wallet",
+    category: "Gaming",
+    description: "Consumer engagement & rewards hub powered by Morph.",
     status: "mainnet",
-    activity: 78,
-    statusLabel: "🚀 Mainnet Live",
+    activity: 58,
+    statusLabel: "Active Testnet",
+    twitterFollowers: "28k+",
   },
 ];
 
 const featuredProjects = allProjects.filter((p) => p.featured);
 const discoveryProjects = allProjects.filter((p) => !p.featured);
 
-const filters = ["All", "Payment", "DeFi", "Gaming", "Infrastructure", "Social"];
+const filters = ["All", "Payment", "DeFi", "Gaming", "Infrastructure"];
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -132,10 +101,39 @@ const fadeUp = {
 
 const MORPH_GRANTS_URL = "https://www.morphl2.io/grants/";
 
+const grantSteps = [
+  {
+    step: 1,
+    title: "Build on Testnet",
+    description: "Deploy and test your dApp on Morph testnet. Validate UX and integrations.",
+    icon: Layers,
+  },
+  {
+    step: 2,
+    title: "Get Community Support",
+    description: "Share your project, gather feedback, and build a user base in the Morph ecosystem.",
+    icon: Zap,
+  },
+  {
+    step: 3,
+    title: "Apply for $150M Payment Accelerator",
+    description: "Submit your application to the Morph Foundation for grants and accelerator support.",
+    icon: CheckCircle2,
+  },
+];
+
 export default function Home() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+
+  useEffect(() => {
+    function openModal() {
+      setModalOpen(true);
+    }
+    document.addEventListener("open-submit-modal", openModal);
+    return () => document.removeEventListener("open-submit-modal", openModal);
+  }, []);
 
   const filteredDiscovery = useMemo(() => {
     let list = discoveryProjects;
@@ -155,7 +153,8 @@ export default function Home() {
   }, [activeFilter, searchQuery]);
 
   return (
-    <div className="grid-bg relative min-h-screen bg-background text-foreground">
+    <div className="grid-bg relative min-h-screen bg-background text-foreground pb-20 md:pb-0">
+      <div className="noise-overlay" />
       <AnimatedBg />
 
       {/* ───────── NAVBAR ───────── */}
@@ -167,20 +166,20 @@ export default function Home() {
           </span>
           <div className="hidden items-center gap-8 text-sm text-muted md:flex">
             <a href="#pulse" className="transition hover:text-foreground">
-              Network
+              Pulse
             </a>
             <a href="#directory" className="transition hover:text-foreground">
               Directory
             </a>
             <a href="#resource" className="transition hover:text-foreground">
-              Resource Hub
+              Grants
             </a>
           </div>
           <a
             href="#directory"
             className="rounded-full bg-morph px-4 py-2 text-sm font-semibold text-background transition hover:bg-morph-dim"
           >
-            Launch App
+            Explore
           </a>
         </div>
       </nav>
@@ -190,7 +189,6 @@ export default function Home() {
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-1/2 top-1/4 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-morph/[0.06] blur-[140px]" />
           <div className="absolute right-1/4 top-1/3 h-[350px] w-[350px] rounded-full bg-morph-dim/[0.04] blur-[110px]" />
-          <div className="absolute bottom-1/4 left-1/4 h-[300px] w-[300px] rounded-full bg-morph/[0.03] blur-[100px]" />
         </div>
 
         <motion.div
@@ -225,7 +223,7 @@ export default function Home() {
             transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
             className="max-w-xl text-base leading-relaxed text-muted sm:text-lg"
           >
-            The ultimate directory and real-time pulse for Morph&apos;s{" "}
+            High-utility ecosystem dashboard for Morph&apos;s{" "}
             <span className="font-semibold text-morph">$150M</span> Payment &
             Consumer Ecosystem.
           </motion.p>
@@ -242,12 +240,12 @@ export default function Home() {
               Explore Apps
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </a>
-            <button
-              onClick={() => setModalOpen(true)}
+            <a
+              href="#resource"
               className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold text-foreground transition hover:border-morph/40 hover:text-morph"
             >
-              Submit Project
-            </button>
+              Grant Roadmap
+            </a>
           </motion.div>
         </motion.div>
 
@@ -262,29 +260,29 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* ───────── LIVE NETWORK PULSE ───────── */}
-      <section id="pulse" className="radial-stats relative px-6 py-24">
+      {/* ───────── LIVE TICKER ───────── */}
+      <section id="pulse" className="radial-stats relative px-6 py-16">
         <div className="mx-auto max-w-7xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="mb-12 text-center"
+            className="mb-8 text-center"
           >
-            <h2 className="text-2xl font-bold sm:text-3xl">
-              Live Network Pulse
-            </h2>
+            <h2 className="text-2xl font-bold sm:text-3xl">Live Pulse</h2>
             <p className="mt-2 text-sm text-muted">
               Real-time metrics from the Morph L2 network
             </p>
           </motion.div>
-
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-5">
-            {stats.map((stat, i) => (
-              <StatCard key={stat.label} {...stat} index={i} />
-            ))}
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <LiveTicker />
+          </motion.div>
         </div>
       </section>
 
@@ -296,26 +294,61 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="mb-10"
+            className="mb-8"
           >
             <h2 className="text-2xl font-bold sm:text-3xl">
               Ecosystem Directory
             </h2>
             <p className="mt-2 text-sm text-muted">
-              Discover apps building the consumer future on Morph
+              Discover real Morph partners and community projects
             </p>
           </motion.div>
 
-          {/* Featured Projects Row */}
+          {/* Search + Category filter at top */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div className="relative flex-1 sm:max-w-sm">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+              <input
+                type="search"
+                placeholder="Search projects..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full rounded-xl border border-border bg-surface py-2.5 pl-9 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted focus:border-morph/40 focus:ring-1 focus:ring-morph/20"
+              />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {filters.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setActiveFilter(tag)}
+                  className={`rounded-full px-4 py-1.5 text-xs font-medium transition ${
+                    tag === activeFilter
+                      ? "bg-morph text-background"
+                      : "border border-border text-muted hover:border-morph/40 hover:text-morph"
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Featured row */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
             className="mb-16"
           >
             <h3 className="mb-5 text-sm font-semibold uppercase tracking-wider text-muted">
-              Featured Projects
+              Featured Partners
             </h3>
             <div className="grid gap-6 sm:grid-cols-2">
               {featuredProjects.map((project, i) => (
@@ -324,45 +357,16 @@ export default function Home() {
             </div>
           </motion.div>
 
-          {/* Discovery Grid */}
+          {/* Discovery grid */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted">
+            <h3 className="mb-5 text-sm font-semibold uppercase tracking-wider text-muted">
               Discover More
             </h3>
-
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="relative flex-1 sm:max-w-xs">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
-                <input
-                  type="search"
-                  placeholder="Search projects..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-xl border border-border bg-surface py-2.5 pl-9 pr-4 text-sm text-foreground outline-none transition placeholder:text-muted focus:border-morph/40 focus:ring-1 focus:ring-morph/20"
-                />
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {filters.map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => setActiveFilter(tag)}
-                    className={`rounded-full px-4 py-1.5 text-xs font-medium transition ${
-                      tag === activeFilter
-                        ? "bg-morph text-background"
-                        : "border border-border text-muted hover:border-morph/40 hover:text-morph"
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
-
             <motion.div layout className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               <AnimatePresence mode="popLayout">
                 {filteredDiscovery.length === 0 ? (
@@ -373,8 +377,7 @@ export default function Home() {
                     exit={{ opacity: 0 }}
                     className="col-span-full py-12 text-center text-sm text-muted"
                   >
-                    No projects match your search. Try a different filter or
-                    query.
+                    No projects match your search. Try a different filter or query.
                   </motion.p>
                 ) : (
                   filteredDiscovery.map((project, i) => (
@@ -387,31 +390,72 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ───────── RESOURCE HUB ───────── */}
+      {/* ───────── GRANT ROADMAP ───────── */}
       <section id="resource" className="relative px-6 py-24">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.97 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="glow-morph gradient-morph mx-auto max-w-5xl rounded-3xl border border-morph/20 p-10 text-center sm:p-16"
-        >
-          <BookOpen className="mx-auto mb-5 h-10 w-10 text-morph" />
-          <h2 className="text-2xl font-bold sm:text-4xl">Resource Hub</h2>
-          <p className="mx-auto mt-4 max-w-lg text-base text-muted">
-            Grants and accelerator programs are run by the Morph Foundation.
-            Apply for official funding and support.
-          </p>
-          <a
-            href={MORPH_GRANTS_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-morph px-8 py-3.5 text-sm font-semibold text-background transition hover:bg-morph-dim"
+        <div className="mx-auto max-w-4xl">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="glow-morph gradient-morph rounded-3xl border border-morph/20 p-8 sm:p-12"
           >
-            Official Morph Grants
-            <ExternalLink className="h-4 w-4" />
-          </a>
-        </motion.div>
+            <div className="mb-10 text-center">
+              <BookOpen className="mx-auto mb-4 h-12 w-12 text-morph" />
+              <h2 className="text-2xl font-bold sm:text-4xl">Grant Roadmap</h2>
+              <p className="mx-auto mt-3 max-w-lg text-sm text-muted">
+                From testnet to accelerator. Follow these steps to apply for the $150M Payment Accelerator.
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              {grantSteps.map((item, i) => (
+                <motion.div
+                  key={item.step}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  className="flex gap-5 rounded-2xl border border-morph/10 bg-background/40 p-5 backdrop-blur-sm"
+                >
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-morph/15">
+                    <item.icon className="h-6 w-6 text-morph" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-morph">
+                      Step {item.step}
+                    </p>
+                    <h3 className="mt-1 text-lg font-bold text-foreground">
+                      {item.title}
+                    </h3>
+                    <p className="mt-1 text-sm text-muted">{item.description}</p>
+                  </div>
+                  {i < grantSteps.length - 1 && (
+                    <ChevronRight className="hidden shrink-0 text-morph/50 sm:block" />
+                  )}
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+              <a
+                href={MORPH_GRANTS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-morph px-8 py-3.5 text-sm font-semibold text-background transition hover:bg-morph-dim"
+              >
+                Official Morph Grants
+                <ExternalLink className="h-4 w-4" />
+              </a>
+              <button
+                onClick={() => setModalOpen(true)}
+                className="inline-flex items-center gap-2 rounded-full border border-morph/40 px-8 py-3.5 text-sm font-semibold text-morph transition hover:bg-morph/10"
+              >
+                Submit Your Project
+              </button>
+            </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* ───────── FOOTER ───────── */}
@@ -431,40 +475,20 @@ export default function Home() {
                 officially affiliated with Morph Labs.
               </p>
             </div>
-
             <div className="flex flex-wrap items-center gap-6 text-sm text-muted">
-              <a href="#" className="transition hover:text-foreground">
-                Docs
-              </a>
-              <a href="#" className="transition hover:text-foreground">
-                Blog
-              </a>
-              <a href="#" className="transition hover:text-foreground">
-                Careers
-              </a>
+              <a href="#" className="transition hover:text-foreground">Docs</a>
+              <a href="#" className="transition hover:text-foreground">Blog</a>
               <span className="hidden h-4 w-px bg-border sm:block" />
-              <a href="#" className="transition hover:text-morph" aria-label="X">
-                𝕏
-              </a>
-              <a
-                href="#"
-                className="transition hover:text-morph"
-                aria-label="Discord"
-              >
-                Discord
-              </a>
-              <a
-                href="#"
-                className="transition hover:text-morph"
-                aria-label="GitHub"
-              >
-                GitHub
-              </a>
+              <a href="#" className="transition hover:text-morph" aria-label="X">𝕏</a>
+              <a href="#" className="transition hover:text-morph" aria-label="Discord">Discord</a>
+              <a href="#" className="transition hover:text-morph" aria-label="GitHub">GitHub</a>
             </div>
           </div>
         </div>
       </footer>
 
+      <Fab onClick={() => setModalOpen(true)} />
+      <BottomNav />
       <SubmitModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );

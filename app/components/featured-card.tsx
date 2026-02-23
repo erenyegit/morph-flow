@@ -23,9 +23,11 @@ export function FeaturedCard({
   status,
   activity = 0,
   statusLabel,
+  twitterFollowers,
   index,
 }: FeaturedCardProps) {
   const badge = categoryBadge[category] ?? { cls: "bg-zinc-500/15 text-zinc-400", glow: "" };
+  const statusText = status === "mainnet" ? "Mainnet Ready" : "Active Testnet";
 
   return (
     <motion.div
@@ -41,9 +43,7 @@ export function FeaturedCard({
           {name.charAt(0)}
         </div>
         <div className="flex flex-col items-end gap-2">
-          {statusLabel && (
-            <span className="text-xs font-medium">{statusLabel}</span>
-          )}
+          <span className="text-xs font-medium text-muted">{statusLabel ?? statusText}</span>
           <span
             className={`flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${
               status === "mainnet"
@@ -56,7 +56,7 @@ export function FeaturedCard({
                 status === "mainnet" ? "bg-morph" : "bg-amber-400"
               }`}
             />
-            {status === "mainnet" ? "Mainnet" : "Testnet"}
+            {statusText}
           </span>
         </div>
       </div>
@@ -70,7 +70,7 @@ export function FeaturedCard({
 
       <p className="mt-2 text-sm leading-relaxed text-muted">{description}</p>
 
-      {/* Activity bar */}
+      {/* Popularity meter */}
       <div className="mt-4 flex items-center gap-3">
         <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-light">
           <motion.div
@@ -89,8 +89,11 @@ export function FeaturedCard({
 
       <div className="mt-5 flex items-center justify-between border-t border-border/40 pt-4">
         <div className="flex items-center gap-3">
-          <a href="#" className="rounded-lg p-1.5 text-muted transition hover:bg-surface-light hover:text-morph" aria-label="Twitter">
+          <a href="#" className="flex items-center gap-1.5 rounded-lg p-1.5 text-muted transition hover:bg-surface-light hover:text-morph" aria-label="Twitter">
             <Twitter className="h-4 w-4" />
+            {twitterFollowers && (
+              <span className="text-xs font-medium">{twitterFollowers}</span>
+            )}
           </a>
           <a href="#" className="rounded-lg p-1.5 text-muted transition hover:bg-surface-light hover:text-morph" aria-label="Docs">
             <FileText className="h-4 w-4" />
